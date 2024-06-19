@@ -18,6 +18,11 @@ const App = () => {
         exercises: 14,
         id: 3,
       },
+      {
+        name: "Redux",
+        exercises: 11,
+        id: 4,
+      },
     ],
   };
 
@@ -38,11 +43,17 @@ const Header = ({ header }) => {
 };
 
 const Content = ({ parts }) => {
+  const total =
+    parts[0].exercises +
+    parts[1].exercises +
+    parts[2].exercises +
+    parts[3].exercises;
   return (
     <div>
       {parts.map((part) => (
         <Part key={part.id} exercises={part.exercises} text={part.name} />
       ))}
+      <Total total={total} />
     </div>
   );
 };
@@ -51,6 +62,14 @@ const Part = ({ id, exercises, text }) => {
   return (
     <p id={id}>
       {text} {exercises}
+    </p>
+  );
+};
+
+const Total = ({ total }) => {
+  return (
+    <p>
+      <b>Total of {total} exercises</b>
     </p>
   );
 };
