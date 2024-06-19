@@ -43,11 +43,10 @@ const Header = ({ header }) => {
 };
 
 const Content = ({ parts }) => {
-  const total =
-    parts[0].exercises +
-    parts[1].exercises +
-    parts[2].exercises +
-    parts[3].exercises;
+  const total = parts.reduce(
+    (accumulator, part) => accumulator + part.exercises,
+    0
+  );
   return (
     <div>
       {parts.map((part) => (
@@ -58,9 +57,9 @@ const Content = ({ parts }) => {
   );
 };
 
-const Part = ({ id, exercises, text }) => {
+const Part = ({ exercises, text }) => {
   return (
-    <p id={id}>
+    <p>
       {text} {exercises}
     </p>
   );
