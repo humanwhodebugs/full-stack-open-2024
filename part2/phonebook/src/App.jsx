@@ -32,8 +32,6 @@ const App = () => {
       setNewName("");
       setNewNumber("");
     }
-
-    console.log(persons);
   };
 
   const handleNameChange = (event) => {
@@ -55,28 +53,60 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        Filter shown with <input value={filter} onChange={handleFilterChange} />
-      </div>
+      <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a New</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          Name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          Number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">Add</button>
-        </div>
-      </form>
+      <PersonForm
+        addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      />
       <h2>Numbers</h2>
-      {personsToShow.map((person) => (
+      <Persons persons={personsToShow} />
+    </div>
+  );
+};
+
+const Filter = ({ filter, handleFilterChange }) => {
+  return (
+    <div>
+      Filter shown with <input value={filter} onChange={handleFilterChange} />
+    </div>
+  );
+};
+
+const PersonForm = ({
+  addPerson,
+  newName,
+  newNumber,
+  handleNameChange,
+  handleNumberChange,
+}) => {
+  return (
+    <form onSubmit={addPerson}>
+      <div>
+        Name: <input value={newName} onChange={handleNameChange} />
+      </div>
+      <div>
+        Number: <input value={newNumber} onChange={handleNumberChange} />
+      </div>
+      <div>
+        <button type="submit">Add</button>
+      </div>
+    </form>
+  );
+};
+
+const Persons = ({ persons }) => {
+  return (
+    <>
+      {persons.map((person) => (
         <p key={person.id}>
           {person.name} {person.number}
         </p>
       ))}
-    </div>
+    </>
   );
 };
 
