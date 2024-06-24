@@ -29,8 +29,22 @@ const App = () => {
       return alert("Number cannot be empty.");
     }
 
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook.`);
+    const existingPerson = persons.find((person) => person.name === newName);
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      );
+      if (confirmUpdate) {
+        phonebook.update(existingPerson.id, personObject).then((response) => {
+          setPersons(
+            persons.map((person) =>
+              person.id !== existingPerson.id ? person : response.data
+            )
+          );
+          setNewName("");
+          setNewNumber("");
+        });
+      }
     } else {
       phonebook.create(personObject).then((response) => {
         setPersons(persons.concat(response.data));
