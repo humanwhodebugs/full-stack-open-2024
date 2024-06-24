@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import Persons from "./components/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -9,7 +12,7 @@ const App = () => {
 
   useEffect(() => {
     axios.get("http://localhost:3001/persons").then((response) => {
-      console.log(response);
+      console.log(response.data);
       setPersons(response.data);
     });
   }, []);
@@ -19,7 +22,6 @@ const App = () => {
     const nameObject = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
     };
 
     if (newName === "") {
@@ -31,9 +33,13 @@ const App = () => {
     if (persons.some((person) => person.name === newName)) {
       alert(`${newName} is already added to phonebook.`);
     } else {
-      setPersons(persons.concat(nameObject));
-      setNewName("");
-      setNewNumber("");
+      axios
+        .post("http://localhost:3001/persons", nameObject)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
+          setNewName("");
+          setNewNumber("");
+        });
     }
   };
 
@@ -68,48 +74,6 @@ const App = () => {
       <h2>Numbers</h2>
       <Persons persons={personsToShow} />
     </div>
-  );
-};
-
-const Filter = ({ filter, handleFilterChange }) => {
-  return (
-    <div>
-      Filter shown with <input value={filter} onChange={handleFilterChange} />
-    </div>
-  );
-};
-
-const PersonForm = ({
-  addPerson,
-  newName,
-  newNumber,
-  handleNameChange,
-  handleNumberChange,
-}) => {
-  return (
-    <form onSubmit={addPerson}>
-      <div>
-        Name: <input value={newName} onChange={handleNameChange} />
-      </div>
-      <div>
-        Number: <input value={newNumber} onChange={handleNumberChange} />
-      </div>
-      <div>
-        <button type="submit">Add</button>
-      </div>
-    </form>
-  );
-};
-
-const Persons = ({ persons }) => {
-  return (
-    <>
-      {persons.map((person) => (
-        <p key={person.id}>
-          {person.name} {person.number}
-        </p>
-      ))}
-    </>
   );
 };
 
