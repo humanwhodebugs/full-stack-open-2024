@@ -10,7 +10,10 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null,
+  });
 
   useEffect(() => {
     phonebook.getAll().then((response) => {
@@ -37,22 +40,53 @@ const App = () => {
         `${newName} is already added to phonebook, replace the old number with a new one?`
       );
       if (confirmUpdate) {
-        phonebook.update(existingPerson.id, personObject).then((response) => {
-          setPersons(
-            persons.map((person) =>
-              person.id !== existingPerson.id ? person : response.data
-            )
-          );
-          setNewName("");
-          setNewNumber("");
-        });
+        phonebook
+          .update(existingPerson.id, personObject)
+          .then((updatedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== existingPerson.id ? person : updatedPerson
+              )
+            );
+            setNewName("");
+            setNewNumber("");
+            setNotification({
+              message: `Updated ${updatedPerson.name}`,
+              type: "success",
+            });
+            setTimeout(() => {
+              setNotification({ message: null, type: null });
+            }, 5000);
+          })
+          .catch((error) => {
+            if (error.response && error.response.status === 404) {
+              setNotification({
+                message: `Information of ${newName} has already been removed from server`,
+                type: "error",
+              });
+              setPersons(
+                persons.filter((person) => person.id !== existingPerson.id)
+              );
+            } else {
+              setNotification({
+                message: `Failed to update ${newName}`,
+                type: "error",
+              });
+            }
+            setTimeout(() => {
+              setNotification({ message: null, type: null });
+            }, 5000);
+          });
       }
     } else {
       phonebook.create(personObject).then((response) => {
         setPersons(persons.concat(response.data));
-        setNotification(`Added ${response.data.name}`);
+        setNotification({
+          message: `Added ${response.data.name}`,
+          type: "success",
+        });
         setTimeout(() => {
-          setNotification(null);
+          setNotification({ message: null, type: null });
         }, 5000);
         setNewName("");
         setNewNumber("");
@@ -79,7 +113,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification.message} type={notification.type} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h2>Add a New</h2>
       <PersonForm

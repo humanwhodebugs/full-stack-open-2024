@@ -14,7 +14,13 @@ const remove = (id) => {
 };
 
 const update = (id, updatedPerson) => {
-  return axios.put(`${baseUrl}/${id}`, updatedPerson);
+  return axios
+    .put(`${baseUrl}/${id}`, updatedPerson)
+    .then((response) => response.data)
+    .catch((error) => {
+      console.error("Error updating person:", error);
+      throw error;
+    });
 };
 
 export default {
