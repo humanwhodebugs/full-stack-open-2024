@@ -5,6 +5,8 @@ const App = () => {
   const [countries, setCountries] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedCountryDetails, setSelectedCountryDetails] = useState(null);
 
   useEffect(() => {
     axios
@@ -25,11 +27,17 @@ const App = () => {
         );
         if (foundCountries.length === 1) {
           setSelectedCountry(foundCountries[0]);
+          setSelectedCountryDetails(foundCountries[0]);
+          setShowDetails(true);
         } else {
           setSelectedCountry(null);
+          setSelectedCountryDetails(null);
+          setShowDetails(false);
         }
       } else {
         setSelectedCountry(null);
+        setSelectedCountryDetails(null);
+        setShowDetails(false);
       }
     }, 300);
 
@@ -38,6 +46,15 @@ const App = () => {
 
   const handleInputChange = (event) => {
     setSearch(event.target.value);
+  };
+
+  const handleShowDetails = (country) => {
+    setSelectedCountryDetails(country);
+    setShowDetails(true);
+  };
+
+  const handleHideDetails = () => {
+    setShowDetails(false);
   };
 
   const filteredCountries = countries.filter((country) =>
@@ -49,19 +66,21 @@ const App = () => {
       <form>
         Find Country <input value={search} onChange={handleInputChange} />
       </form>
-      {selectedCountry ? (
+      {selectedCountryDetails && showDetails ? (
         <div>
-          <h2>{selectedCountry.name.common}</h2>
-          <p>Capital: {selectedCountry.capital}</p>
-          <p>Area: {selectedCountry.area} km²</p>
+          <h2>{selectedCountryDetails.name.common}</h2>
+          <p>Capital: {selectedCountryDetails.capital}</p>
+          <p>Area: {selectedCountryDetails.area} km²</p>
           <img
-            src={selectedCountry.flags.png}
-            alt={`Flag of ${selectedCountry.name.common}`}
+            src={selectedCountryDetails.flags.png}
+            alt={`Flag of ${selectedCountryDetails.name.common}`}
             style={{ height: "100px" }}
           />
           <p>
-            Languages: {Object.values(selectedCountry.languages).join(", ")}
+            Languages:{" "}
+            {Object.values(selectedCountryDetails.languages).join(", ")}
           </p>
+          <button onClick={handleHideDetails}>Hide Details</button>
         </div>
       ) : (
         search !== "" && (
@@ -71,7 +90,14 @@ const App = () => {
             ) : filteredCountries.length > 0 ? (
               <div>
                 {filteredCountries.map((country) => (
-                  <p key={country.cca3}>{country.name.common}</p>
+                  <div key={country.cca3}>
+                    <p>{country.name.common}</p>
+                    {filteredCountries.length < 10 && (
+                      <button onClick={() => handleShowDetails(country)}>
+                        Show
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             ) : (
