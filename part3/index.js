@@ -4,8 +4,6 @@ const app = express();
 
 app.use(express.json());
 
-app.use(morgan("tiny"));
-
 let persons = [
   {
     id: "1",
@@ -29,15 +27,17 @@ let persons = [
   },
 ];
 
-app.get("/", (request, response) => {
+const getMorgan = morgan("tiny");
+
+app.get("/", getMorgan, (request, response) => {
   response.send("<h1>Phonebook Backend</h1>");
 });
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", getMorgan, (request, response) => {
   response.json(persons);
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", getMorgan, (request, response) => {
   const id = request.params.id;
   const person = persons.find((person) => person.id === id);
 
@@ -55,7 +55,7 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
-app.get("/info", (request, response) => {
+app.get("/info", getMorgan, (request, response) => {
   const date = new Date();
   const personCount = persons.length;
   response.send(`
@@ -69,7 +69,15 @@ const generateRandomId = () => {
   return String(id);
 };
 
-app.post("/api/persons", (request, response) => {
+const postMorgan = morgan(
+  ":method :url :status :res[content-length] - :response-time ms :request-body"
+);
+
+morgan.token("request-body", (req, res) => {
+  return JSON.stringify(req.body);
+});
+
+app.post("/api/persons", postMorgan, (request, response) => {
   const body = request.body;
 
   if (!body.name) {
