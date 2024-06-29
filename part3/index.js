@@ -1,7 +1,10 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
+
+app.use(morgan("tiny"));
 
 let persons = [
   {
@@ -71,11 +74,11 @@ app.post("/api/persons", (request, response) => {
 
   if (!body.name) {
     return response.status(400).json({
-      error: "Name cannot be empty!",
+      Error: "Name cannot be empty!",
     });
   } else if (!body.number) {
     return response.status(400).json({
-      error: "Number cannot be empty!",
+      Error: "Number cannot be empty!",
     });
   }
 
@@ -83,7 +86,7 @@ app.post("/api/persons", (request, response) => {
 
   if (numberExist) {
     return response.status(400).json({
-      error: "Number already exists in the phonebook!",
+      Error: "Number already exists in the phonebook!",
     });
   }
 
@@ -91,7 +94,7 @@ app.post("/api/persons", (request, response) => {
 
   if (nameExist) {
     return response.status(400).json({
-      error: "Name already exists in the phonebook!",
+      Error: "Name already exists in the phonebook!",
     });
   }
 
@@ -108,5 +111,5 @@ app.post("/api/persons", (request, response) => {
 
 const PORT = 3001;
 app.listen(PORT, () => {
-  console.log(`Phonebook Backend`);
+  console.log(`Server running on port ${PORT}`);
 });
