@@ -69,6 +69,32 @@ const generateRandomId = () => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
+  if (!body.name) {
+    return response.status(400).json({
+      error: "Name cannot be empty!",
+    });
+  } else if (!body.number) {
+    return response.status(400).json({
+      error: "Number cannot be empty!",
+    });
+  }
+
+  const numberExist = persons.find((person) => person.number === body.number);
+
+  if (numberExist) {
+    return response.status(400).json({
+      error: "Number already exists in the phonebook!",
+    });
+  }
+
+  const nameExist = persons.find((person) => person.name === body.name);
+
+  if (nameExist) {
+    return response.status(400).json({
+      error: "Name already exists in the phonebook!",
+    });
+  }
+
   const person = {
     id: generateRandomId(),
     name: body.name,
