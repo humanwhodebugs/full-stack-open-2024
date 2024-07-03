@@ -98,6 +98,7 @@ app.post("/api/persons", postMorgan, (request, response) => {
     });
   }
 
+  /*
   const numberExist = persons.find((person) => person.number === body.number);
 
   if (numberExist) {
@@ -123,6 +124,16 @@ app.post("/api/persons", postMorgan, (request, response) => {
   persons = persons.concat(person);
 
   response.json(person);
+  */
+
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  });
+
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT || 3001;
