@@ -6,7 +6,7 @@ const name = process.argv[3];
 
 const number = process.argv[4];
 
-const url = `mongodb+srv://zeitakubyo:${password}@cluster0.fzigoqo.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`;
+const url = ``;
 
 mongoose.set("strictQuery", false);
 
