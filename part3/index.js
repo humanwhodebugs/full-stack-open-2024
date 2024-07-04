@@ -94,34 +94,6 @@ app.post("/api/persons", postMorgan, (request, response, next) => {
     });
   }
 
-  /*
-  const numberExist = persons.find((person) => person.number === body.number);
-
-  if (numberExist) {
-    return response.status(400).json({
-      Error: "Number already exists in the phonebook!",
-    });
-  }
-
-  const nameExist = persons.find((person) => person.name === body.name);
-
-  if (nameExist) {
-    return response.status(400).json({
-      Error: "Name already exists in the phonebook!",
-    });
-  }
-
-  const person = {
-    id: generateRandomId(),
-    name: body.name,
-    number: body.number,
-  };
-
-  persons = persons.concat(person);
-
-  response.json(person);
-  */
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -131,6 +103,17 @@ app.post("/api/persons", postMorgan, (request, response, next) => {
     .save()
     .then((savedPerson) => {
       response.json(savedPerson);
+    })
+    .catch((error) => next(error));
+});
+
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body;
+  const person = { name: body.name, number: body.number };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
     })
     .catch((error) => next(error));
 });
