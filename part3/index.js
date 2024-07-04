@@ -39,10 +39,12 @@ app.get("/", getMorgan, (request, response) => {
   response.send("<h1>Phonebook Backend</h1>");
 });
 
-app.get("/api/persons", getMorgan, (request, response) => {
-  Person.find({}).then((people) => {
-    response.json(people);
-  });
+app.get("/api/persons", getMorgan, (request, response, next) => {
+  Person.find({})
+    .then((people) => {
+      response.json(people);
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/persons/:id", getMorgan, (request, response) => {
@@ -56,11 +58,10 @@ app.get("/api/persons/:id", getMorgan, (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  person = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then((result) => response.status(204).end())
+    .catch((error) => next(error));
 });
 
 app.get("/info", getMorgan, (request, response) => {
@@ -72,11 +73,6 @@ app.get("/info", getMorgan, (request, response) => {
   `);
 });
 
-const generateRandomId = () => {
-  const id = Math.floor(Math.random() * (10000 - 5 + 1)) + 5;
-  return String(id);
-};
-
 const postMorgan = morgan(
   ":method :url :status :res[content-length] - :response-time ms :request-body"
 );
@@ -85,7 +81,7 @@ morgan.token("request-body", (req, res) => {
   return JSON.stringify(req.body);
 });
 
-app.post("/api/persons", postMorgan, (request, response) => {
+app.post("/api/persons", postMorgan, (request, response, next) => {
   const body = request.body;
 
   if (!body.name) {
@@ -131,10 +127,31 @@ app.post("/api/persons", postMorgan, (request, response) => {
     number: body.number,
   });
 
-  person.save().then((savedPerson) => {
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      response.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "Unknown endpoint!" });
+};
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "Malformatted id!" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
