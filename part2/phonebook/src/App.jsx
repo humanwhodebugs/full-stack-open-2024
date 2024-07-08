@@ -16,9 +16,14 @@ const App = () => {
   });
 
   useEffect(() => {
-    phonebook.getAll().then((response) => {
-      setPersons(response.data);
-    });
+    phonebook
+      .getAll()
+      .then((response) => {
+        setPersons(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   const addPerson = (event) => {
@@ -79,18 +84,36 @@ const App = () => {
           });
       }
     } else {
-      phonebook.create(personObject).then((response) => {
-        setPersons(persons.concat(response.data));
-        setNotification({
-          message: `Added ${response.data.name}`,
-          type: "success",
+      phonebook
+        .create(personObject)
+        .then((response) => {
+          setPersons(persons.concat(response.data));
+          setNotification({
+            message: `Added ${response.data.name}`,
+            type: "success",
+          });
+          setTimeout(() => {
+            setNotification({ message: null, type: null });
+          }, 5000);
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            setNotification({
+              message: error.response.data.error,
+              type: "error",
+            });
+          } else {
+            setNotification({
+              message: "Failed to add person",
+              type: "error",
+            });
+          }
+          setTimeout(() => {
+            setNotification({ message: null, type: null });
+          }, 5000);
         });
-        setTimeout(() => {
-          setNotification({ message: null, type: null });
-        }, 5000);
-        setNewName("");
-        setNewNumber("");
-      });
     }
   };
 
@@ -106,9 +129,11 @@ const App = () => {
     setFilter(event.target.value);
   };
 
-  const personsToShow = persons.filter((person) =>
-    person.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const personsToShow = filter
+    ? persons.filter((person) =>
+        person.name.toLowerCase().includes(filter.toLowerCase())
+      )
+    : persons;
 
   return (
     <div>

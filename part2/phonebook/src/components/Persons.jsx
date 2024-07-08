@@ -17,16 +17,17 @@ const Persons = ({ persons, setPersons }) => {
   };
 
   return (
-    <>
-      {persons.map((person) => (
-        <div key={person.id}>
-          {person.name} {person.number}{" "}
-          <button onClick={() => handleDelete(person.id, person.name)}>
-            Delete
-          </button>
-        </div>
-      ))}
-    </>
+    <div>
+      {persons && persons.length > 0 ? (
+        persons.map((person) => (
+          <p key={person.id}>
+            {person.name} {person.number}
+          </p>
+        ))
+      ) : (
+        <p>No persons found</p>
+      )}
+    </div>
   );
 };
 
