@@ -32,6 +32,28 @@ test('Unique identifier property of the blog posts is named id', async () => {
   });
 });
 
+test('Making an HTTP post', async () => {
+  const newBlog = {
+    title: 'Testing HTTP post',
+    author: 'Nobody',
+    url: 'http://testing.com',
+    likes: 20,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const response = await api.get('/api/blogs');
+  const blogs = response.body;
+  const titles = blogs.map((r) => r.title);
+
+  assert.strictEqual(blogs.length, helper.initialBlogs.length + 1);
+  assert(titles.includes('Testing HTTP post'));
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
