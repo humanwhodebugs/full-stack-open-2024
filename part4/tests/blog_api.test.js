@@ -54,6 +54,24 @@ test('Making an HTTP post', async () => {
   assert(titles.includes('Testing HTTP post'));
 });
 
+test('Likes default to 0 if not provided', async () => {
+  const newBlog = {
+    title: 'Blog without likes',
+    author: 'Nobody',
+    url: 'http://testing.com',
+  };
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const createdBlog = response.body;
+
+  assert.strictEqual(createdBlog.likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
