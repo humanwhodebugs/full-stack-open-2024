@@ -11,7 +11,6 @@ const Blog = require('../models/blog');
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-
   await Blog.insertMany(helper.initialBlogs);
 });
 
@@ -23,8 +22,8 @@ test('Blogs are returned as JSON', async () => {
 });
 
 test('Unique identifier property of the blog posts is named id', async () => {
-  const response = api.get('/api/blogs');
-  const blogs = (await response).body;
+  const response = await api.get('/api/blogs');
+  const blogs = response.body;
 
   blogs.forEach((blog) => {
     assert(blog.id, 'Blog should have an id property');
@@ -70,6 +69,40 @@ test('Likes default to 0 if not provided', async () => {
   const createdBlog = response.body;
 
   assert.strictEqual(createdBlog.likes, 0);
+});
+
+test('Creation fails with status 400 if title is missing', async () => {
+  const newBlog = {
+    author: 'Nobody',
+    url: 'http://testing.com',
+    likes: 5,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+});
+
+test('Creation fails with status 400 if url is missing', async () => {
+  const newBlog = {
+    title: 'Testing Blog without URL',
+    author: 'Nobody',
+    likes: 5,
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
 });
 
 after(async () => {
