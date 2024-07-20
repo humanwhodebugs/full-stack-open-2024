@@ -119,6 +119,22 @@ test('Succeeds with status code 204 if ID is valid', async () => {
   assert(!titles.includes(blogToDelete.title));
 });
 
+test('Update the number of likes for a blog post', async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+
+  const updatedLikes = 99;
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send({ likes: updatedLikes })
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  const updatedBlog = await Blog.findById(blogToUpdate.id);
+  assert.strictEqual(updatedBlog.likes, updatedLikes);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });

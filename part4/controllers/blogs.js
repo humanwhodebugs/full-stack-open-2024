@@ -6,6 +6,26 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
+blogsRouter.put('/:id', async (request, response) => {
+  const { likes } = request.body;
+
+  if (likes === undefined || typeof likes !== 'number') {
+    return response.status(400).json({ error: 'Likes must be a number' });
+  }
+
+  const updatedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { likes },
+    { new: true }
+  );
+
+  if (updatedBlog) {
+    response.json(updatedBlog);
+  } else {
+    response.status(404).end();
+  }
+});
+
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body;
 
