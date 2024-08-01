@@ -10,26 +10,14 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const { title, author, url, likes } = request.body;
+  const user = request.user;
 
   if (!title || !url) {
     return response.status(400).json({ error: 'Title and URL are required' });
   }
 
-  if (!request.token) {
-    return response.status(401).json({ error: 'Token missing or invalid' });
-  }
-
-  let decodedToken;
-  try {
-    decodedToken = jwt.verify(request.token, process.env.SECRET);
-  } catch (error) {
-    return response.status(401).json({ error: 'Token invalid' });
-  }
-
-  const user = await User.findById(decodedToken.id);
-
   if (!user) {
-    return response.status(400).json({ error: 'User not found' });
+    return response.status(401).json({ error: 'User not authenticated' });
   }
 
   const blog = new Blog({
@@ -82,28 +70,22 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params;
-  const token = request.token;
+  const user = request.user;
 
-  if (!token) {
-    return response.status(401).json({ error: 'token missing or invalid' });
-  }
-
-  const decodedToken = jwt.verify(token, process.env.SECRET);
-
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' });
+  if (!user) {
+    return response.status(401).json({ error: 'User not authenticated' });
   }
 
   const blog = await Blog.findById(id);
 
   if (!blog) {
-    return response.status(404).json({ error: 'blog not found' });
+    return response.status(404).json({ error: 'Blog not found' });
   }
 
-  if (blog.user.toString() !== decodedToken.id.toString()) {
+  if (blog.user.toString() !== user._id.toString()) {
     return response
       .status(403)
-      .json({ error: 'forbidden: only the creator can delete the blog' });
+      .json({ error: 'Forbidden: only the creator can delete the blog' });
   }
 
   await Blog.findByIdAndDelete(id);
