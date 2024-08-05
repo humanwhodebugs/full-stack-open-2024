@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
+import Notification from './components/Notification';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -7,6 +8,8 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState('');
   const [user, setUser] = useState(null);
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -36,12 +39,18 @@ const App = () => {
         url: url,
       };
 
-      blogService.create(blogObject).then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog));
-        setTitle('');
-        setAuthor('');
-        setUrl('');
-      });
+      const returnedBlog = await blogService.create(blogObject);
+      setBlogs(blogs.concat(returnedBlog));
+      setTitle('');
+      setAuthor('');
+      setUrl('');
+
+      setMessage(`A new blog '${title}' by '${author}' added!`);
+      setMessageType('success');
+      setTimeout(() => {
+        setMessage(null);
+        setMessageType('');
+      }, 5000);
     } catch (error) {
       console.error('Error', error);
     }
@@ -61,8 +70,13 @@ const App = () => {
       setUser(user);
       setUsername('');
       setPassword('');
-    } catch (error) {
-      console.error('Error', error);
+    } catch (exception) {
+      setMessage('Wrong username or password!');
+      setMessageType('error');
+      setTimeout(() => {
+        setMessage(null);
+        setMessageType('');
+      }, 5000);
     }
   };
 
@@ -103,6 +117,7 @@ const App = () => {
     return (
       <div>
         <h2>Login to Application</h2>
+        <Notification message={message} type={messageType} />
         {loginForm()}
       </div>
     );
@@ -111,6 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Blogs</h2>
+      <Notification message={message} type={messageType} />
       <div>
         {user.name} logged in <button onClick={handleLogout}>Logout</button>
       </div>
