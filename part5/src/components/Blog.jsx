@@ -1,38 +1,39 @@
-import { useState } from 'react';
-import blogService from '../services/blogs';
+import PropTypes from 'prop-types'
+import { useState } from 'react'
+import blogService from '../services/blogs'
 
 const Blog = ({ blog, user, setBlogs }) => {
-  const [visible, setVisible] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
+  const [visible, setVisible] = useState(false)
+  const [likes, setLikes] = useState(blog.likes)
 
   const toggleVisibility = () => {
-    setVisible(!visible);
-  };
+    setVisible(!visible)
+  }
 
   const handleLike = async () => {
     const updatedBlog = {
       ...blog,
       likes: likes + 1,
-    };
+    }
 
-    const returnedBlog = await blogService.update(blog.id, updatedBlog);
-    setLikes(returnedBlog.likes);
-  };
+    const returnedBlog = await blogService.update(blog.id, updatedBlog)
+    setLikes(returnedBlog.likes)
+  }
 
   const handleDelete = async () => {
     const confirmDelete = window.confirm(
       `Remove blog ${blog.title} by ${blog.author}?`
-    );
+    )
 
     if (confirmDelete) {
       try {
-        await blogService.remove(blog.id);
-        setBlogs((blogs) => blogs.filter((b) => b.id !== blog.id));
+        await blogService.remove(blog.id)
+        setBlogs((blogs) => blogs.filter((b) => b.id !== blog.id))
       } catch (exception) {
-        console.error(exception);
+        console.error(exception)
       }
     }
-  };
+  }
 
   const blogStyle = {
     paddingTop: 10,
@@ -40,7 +41,7 @@ const Blog = ({ blog, user, setBlogs }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-  };
+  }
 
   return (
     <div style={blogStyle}>
@@ -62,7 +63,25 @@ const Blog = ({ blog, user, setBlogs }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Blog;
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      username: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+  }),
+  setBlogs: PropTypes.func.isRequired,
+}
+
+export default Blog
