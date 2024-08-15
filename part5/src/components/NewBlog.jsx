@@ -1,22 +1,22 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
 const NewBlog = ({ createBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
 
   const addBlog = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     createBlog({
       title: title,
       author: author,
       url: url,
-    })
+    });
 
-    setTitle('')
-    setAuthor('')
-    setUrl('')
-  }
+    setTitle('');
+    setAuthor('');
+    setUrl('');
+  };
 
   return (
     <div>
@@ -25,34 +25,37 @@ const NewBlog = ({ createBlog }) => {
         <div>
           Title
           <input
-            type="text"
+            type='text'
             value={title}
-            name="Title"
+            name='Title'
             onChange={({ target }) => setTitle(target.value)}
+            aria-label='Title'
           />
         </div>
         <div>
           Author
           <input
-            type="text"
+            type='text'
             value={author}
-            name="Author"
+            name='Author'
             onChange={({ target }) => setAuthor(target.value)}
+            aria-label='Author'
           />
         </div>
         <div>
           URL
           <input
-            type="url"
+            type='url'
             value={url}
-            name="URL"
+            name='URL'
             onChange={({ target }) => setUrl(target.value)}
+            aria-label='URL'
           />
         </div>
-        <button type="submit">Create</button>
+        <button type='submit'>Create</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default NewBlog
+export default NewBlog;

@@ -1,4 +1,3 @@
-// src/tests/Blog.test.jsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import Blog from '../components/Blog';
 import { describe, it, expect, vi } from 'vitest';
