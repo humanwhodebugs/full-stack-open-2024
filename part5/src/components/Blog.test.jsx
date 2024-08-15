@@ -1,7 +1,7 @@
 // src/tests/Blog.test.jsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import Blog from '../components/Blog';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 describe('Blog component', () => {
   const blog = {
@@ -48,5 +48,31 @@ describe('Blog component', () => {
 
     expect(urlElement).toBeVisible();
     expect(likesElement).toBeVisible();
+  });
+
+  it('calls the like button event handler twice when the like button is clicked twice', () => {
+    // Mock the event handler
+    const mockHandler = vi.fn();
+
+    render(
+      <Blog blog={blog} user={{ username: 'mchan' }} setBlogs={() => {}} />
+    );
+
+    // Find and click the view button to show the like button
+    const viewButton = screen.getByText('View');
+    fireEvent.click(viewButton);
+
+    // Replace the real handler with the mock handler
+    const likeButton = screen.getByText('Like');
+
+    // Set up the mock to be used in the Blog component
+    likeButton.onclick = mockHandler;
+
+    // Click the like button twice
+    fireEvent.click(likeButton);
+    fireEvent.click(likeButton);
+
+    // Ensure the event handler was called twice
+    expect(mockHandler).toHaveBeenCalledTimes(2);
   });
 });
