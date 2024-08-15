@@ -1,26 +1,24 @@
-import { render, screen } from '@testing-library/react';
+// src/tests/Blog.test.jsx
+import { render, screen, fireEvent } from '@testing-library/react';
 import Blog from '../components/Blog';
 import { describe, it, expect } from 'vitest';
 
 describe('Blog component', () => {
-  it('renders title and author but not url or likes by default', () => {
-    const blog = {
-      title: 'React patterns',
-      author: 'Michael Chan',
-      url: 'https://reactpatterns.com/',
-      likes: 7,
-      user: {
-        username: 'mchan',
-        name: 'Michael Chan',
-      },
-    };
+  const blog = {
+    id: '12345',
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    likes: 7,
+    user: {
+      username: 'mchan',
+      name: 'Michael Chan',
+    },
+  };
 
+  it('renders title and author but not url or likes by default', () => {
     render(
-      <Blog
-        blog={{ ...blog, id: '12345' }}
-        user={{ username: 'mchan' }}
-        setBlogs={() => {}}
-      />
+      <Blog blog={blog} user={{ username: 'mchan' }} setBlogs={() => {}} />
     );
 
     // Check if title and author are rendered
@@ -33,5 +31,22 @@ describe('Blog component', () => {
 
     expect(urlElement).toBeNull();
     expect(likesElement).toBeNull();
+  });
+
+  it('shows url and likes when the view button is clicked', () => {
+    render(
+      <Blog blog={blog} user={{ username: 'mchan' }} setBlogs={() => {}} />
+    );
+
+    // Find and click the view button
+    const viewButton = screen.getByText('View');
+    fireEvent.click(viewButton);
+
+    // Now url and likes should be visible
+    const urlElement = screen.getByText('https://reactpatterns.com/');
+    const likesElement = screen.getByText('Likes 7');
+
+    expect(urlElement).toBeVisible();
+    expect(likesElement).toBeVisible();
   });
 });
