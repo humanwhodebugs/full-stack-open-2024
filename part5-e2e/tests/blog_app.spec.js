@@ -65,4 +65,19 @@ describe('Blog app', () => {
 
     await expect(likesCount).toHaveText(`${parseInt(initialLikes) + 1}`);
   });
+
+  test('the user who added the blog can delete it', async ({ page }) => {
+    await page.getByText('Blog to be deleted John Doe').click();
+
+    page.on('dialog', async (dialog) => {
+      expect(dialog.type()).toBe('confirm');
+      await dialog.accept();
+    });
+
+    await page.getByRole('button', { name: 'Remove' }).click();
+
+    await expect(
+      page.getByText('Blog to be deleted John Doe')
+    ).not.toBeVisible();
+  });
 });
