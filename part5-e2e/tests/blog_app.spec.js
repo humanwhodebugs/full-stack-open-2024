@@ -36,4 +36,20 @@ describe('Blog app', () => {
       await expect(page.getByText('Wrong username or password!')).toBeVisible();
     });
   });
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await page.goto('http://localhost:5173');
+    });
+
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create Blog' }).click();
+      await page.fill('input[name="Title"]', 'My New Blog');
+      await page.fill('input[name="Author"]', 'John Doe');
+      await page.fill('input[name="Url"]', 'http://example.com');
+      await page.getByRole('button', { name: 'Create' }).click();
+
+      await expect(page.getByText('My New Blog John Doe')).toBeVisible();
+    });
+  });
 });
