@@ -52,4 +52,17 @@ describe('Blog app', () => {
       await expect(page.getByText('My New Blog John Doe')).toBeVisible();
     });
   });
+
+  test('a blog can be liked', async ({ page }) => {
+    await page.getByText('Blog to be liked Jane Doe').click();
+
+    const likeButton = page.getByRole('button', { name: 'Like' });
+    const likesCount = page.locator('.likes');
+
+    const initialLikes = await likesCount.innerText();
+
+    await likeButton.click();
+
+    await expect(likesCount).toHaveText(`${parseInt(initialLikes) + 1}`);
+  });
 });
