@@ -4,14 +4,32 @@ describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3001/api/testing/reset');
 
-    const newUser = {
-      username: 'testuser',
-      name: 'Test User',
-      password: 'testpassword',
+    const user1 = {
+      username: 'user1',
+      name: 'User One',
+      password: 'password1',
     };
-    await request.post('http://localhost:3001/api/users').send(newUser);
+    const user2 = {
+      username: 'user2',
+      name: 'User Two',
+      password: 'password2',
+    };
+    await request.post('http://localhost:3001/api/users').send(user1);
+    await request.post('http://localhost:3001/api/users').send(user2);
 
     await page.goto('http://localhost:5173');
+    await page.getByRole('button', { name: 'log in' }).click();
+    await page.fill('input[name="Username"]', 'user1');
+    await page.fill('input[name="Password"]', 'password1');
+    await page.getByRole('button', { name: 'Login' }).click();
+
+    await page.getByRole('button', { name: 'Create Blog' }).click();
+    await page.fill('input[name="Title"]', 'Blog created by user1');
+    await page.fill('input[name="Author"]', 'User One');
+    await page.fill('input[name="Url"]', 'http://example.com');
+    await page.getByRole('button', { name: 'Create' }).click();
+
+    await page.getByRole('button', { name: 'Logout' }).click();
   });
 
   test('Login form is shown', async ({ page }) => {
@@ -79,5 +97,26 @@ describe('Blog app', () => {
     await expect(
       page.getByText('Blog to be deleted John Doe')
     ).not.toBeVisible();
+  });
+
+  describe('When logged in as a different user', () => {
+    beforeEach(async ({ page }) => {
+      await page.goto('http://localhost:5173');
+
+      await page.getByRole('button', { name: 'log in' }).click();
+      await page.fill('input[name="Username"]', 'user2');
+      await page.fill('input[name="Password"]', 'password2');
+      await page.getByRole('button', { name: 'Login' }).click();
+    });
+
+    test('the delete button is not visible to users who did not create the blog', async ({
+      page,
+    }) => {
+      await page.getByText('Blog created by user1 User One').click();
+
+      await expect(
+        page.getByRole('button', { name: 'Remove' })
+      ).not.toBeVisible();
+    });
   });
 });
