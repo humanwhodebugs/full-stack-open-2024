@@ -24,3 +24,5 @@ Each part of the course has its own directory, containing the exercises for that
 - part2
 - part3
 - part4
+- part5
+- part5-e2e
